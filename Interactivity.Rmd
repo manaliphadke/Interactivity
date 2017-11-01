@@ -1,0 +1,28 @@
+---
+title: "Interactivity"
+author: "Manali Phadke"
+date: "November 1, 2017"
+output: html_document
+---
+```{r}
+library(tidyverse)
+library(janitor)
+library(stringr)
+library(forcats)
+library(viridis)
+
+library(plotly)
+
+airbnb = read.csv("./data/nyc_airbnb.zip") %>%
+  clean_names() %>%
+  rename(boro = neighborhood_group)%>%
+  filter()
+
+
+```
+
+
+```{r}
+airbnb %>%
+  plot_ly(x = ~longitude)
+  
