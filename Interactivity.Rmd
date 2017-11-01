@@ -15,7 +15,8 @@ library(plotly)
 
 airbnb = read.csv("./data/nyc_airbnb.zip") %>%
   clean_names() %>%
-  rename(boro = neighborhood_group)%>%
+  rename(boro = neighborhood_group) %>%
+  mutate (rating = review_scores_location /2)%>%
   filter()
 
 
@@ -24,5 +25,57 @@ airbnb = read.csv("./data/nyc_airbnb.zip") %>%
 
 ```{r}
 airbnb %>%
-  plot_ly(x = ~longitude)
+  mutate(hover_text = str_c("Price: $", price, '\nRating: ', rating)) %>%
+  plot_ly(x = ~longitude, y = ~latitude, 
+          type = "scatter", mode = "marker",alpha = 0.5)
   
+
+```
+
+#Make boxplots
+```{r}
+airbnb %>%
+  mutate(neighbourhood = fct_reorder(neighbourhood, price)) %>%
+  plot_ly(x = ~neighborhood, y ~ price, color = neieghborhood)
+
+
+
+common_neighborhoods =
+  airbnb_data %>% 
+  count(neighbourhood, sort = TRUE) %>% 
+  top_n(8) %>% 
+  select(neighbourhood)
+## Selecting by n
+
+inner_join(airbnb_data, common_neighborhoods,
+             by = "neighbourhood") %>% 
+  mutate(neighbourhood = fct_reorder(neighbourhood, price)) %>% 
+  plot_ly(y = ~price, color = ~neighbourhood, type = "box",
+          colors = "Set2")
+```
+
+
+#Make Barcharts 
+
+```{r}
+#need a variable detailing height of each bar
+
+airbnb %>% 
+  count(neighbourhood) %>% 
+  mutate(neighbourhood = fct_reorder(neighbourhood, n)) %>% 
+  plot_ly(x = ~neighbourhood, y = ~n, color = ~neighbourhood, type = "bar")
+
+```
+
+# GGPplotly
+```{r}
+
+scatter_ggplot = airbnb_data %>%
+  ggplot(aes(x = longitude, y = latitude, color = price)) +
+  geom_point(alpha = 0.25) +
+  scale_color_viridis() +
+  coord_cartesian() +
+  theme_classic()
+
+ggplotly(scatter_ggplot)
+
